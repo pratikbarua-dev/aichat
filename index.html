@@ -844,15 +844,23 @@ CRITICAL FORMATTING RULES:
             renderMessageToUI('assistant', decryptedReply, false, 'AI', 'LustBot');
             
             // Save AI reply to Supabase (Unified)
-            supabase.from('chat_messages').insert({
-                room_id: targetRoom,
-                nickname: 'AI_BOT',
-                content: decryptedReply,
-                client_id: MY_CLIENT_ID,
-                created_at: new Date().toISOString()
-            }).then(({ error }) => {
-                if (error) console.error("AI Save Error:", error);
-            });
+            try {
+                const { data, error } = await supabase.from('chat_messages').insert({
+                    room_id: targetRoom,
+                    nickname: 'AI_BOT',
+                    content: decryptedReply,
+                    client_id: MY_CLIENT_ID,
+                    created_at: new Date().toISOString()
+                }).select();
+                
+                if (error) {
+                    console.error("AI Save Supabase Error:", error);
+                } else {
+                    console.log("AI message saved successfully:", data);
+                }
+            } catch (dbErr) {
+                console.error("AI Save Exception:", dbErr);
+            }
 
             setTimeout(vibrateShort, 200);
 
