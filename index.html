@@ -359,7 +359,14 @@
     // PROFILE LOGIC
     // ──────────────────────────────────────────────
     function isProfileEmpty() { return !userProfile.name || !userProfile.gender; }
-    if (isProfileEmpty()) setTimeout(() => profileModal.classList.remove('hidden'), 1200);
+    
+    setTimeout(() => {
+        if (isProfileEmpty()) {
+            profileModal.classList.remove('hidden');
+        } else if (!puter.auth.isSignedIn()) {
+            showPuterModal();
+        }
+    }, 1200);
 
     profileBtn.addEventListener('click', () => {
         document.getElementById('prof-name').value = userProfile.name || '';
