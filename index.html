@@ -211,6 +211,24 @@
         </div>
     </div>
 
+    <!-- PUTER MODAL -->
+    <div id="puter-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-night-surface rounded-2xl shadow-2xl max-w-md w-full p-6 border border-lust-primary/30 animate-fade-in-up relative">
+            <h3 class="text-xl font-bold text-lust-light mb-3 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-lust-primary"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                Free Access Notice
+            </h3>
+            <p class="text-gray-300 text-[15px] leading-relaxed mb-6">
+                To give you free and uncensored access to our AI chat, we are powered by <strong class="text-white font-semibold">Puter</strong>. 
+                <br><br>
+                They are not affiliated with us and do not provide us with any of your data, so feel completely safe to sign up and authenticate with them if requested!
+            </p>
+            <div class="flex justify-end gap-3 mt-6">
+                <button id="puter-modal-close" class="px-6 py-2.5 bg-gradient-to-tr from-lust-dark to-lust-primary text-white rounded-full hover:shadow-[0_0_15px_rgba(225,29,72,0.4)] transition glow-on-hover font-medium">Understood, Let's Play</button>
+            </div>
+        </div>
+    </div>
+
     <!-- UPDATED ROOM MODAL WITH ACTIVE STATE VIEW -->
     <div id="room-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-night-surface rounded-2xl shadow-2xl max-w-md w-full p-6 border border-lust-primary/30 animate-fade-in-up">
@@ -353,6 +371,13 @@
         };
         localStorage.setItem('lust_user_profile', JSON.stringify(userProfile));
         profileModal.classList.add('hidden');
+        
+        // Show Puter modal
+        document.getElementById('puter-modal').classList.remove('hidden');
+    });
+
+    document.getElementById('puter-modal-close').addEventListener('click', () => {
+        document.getElementById('puter-modal').classList.add('hidden');
     });
 
     // ──────────────────────────────────────────────
@@ -812,12 +837,14 @@ CRITICAL FORMATTING RULES:
             renderMessageToUI('assistant', decryptedReply, false, 'AI', 'LustBot');
             
             // Save AI reply to Supabase (Unified)
-            await supabase.from('chat_messages').insert({
+            supabase.from('chat_messages').insert({
                 room_id: targetRoom,
                 nickname: 'AI_BOT',
                 content: decryptedReply,
                 client_id: MY_CLIENT_ID,
                 created_at: new Date().toISOString()
+            }).then(({ error }) => {
+                if (error) console.error("AI Save Error:", error);
             });
 
             setTimeout(vibrateShort, 200);
